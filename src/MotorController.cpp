@@ -2,16 +2,16 @@
  * @ Author: Richard Barnes
  * @ Create Time: 2022-02-12 09:57:42
  * @ Modified by: Richard Barnes
- * @ Modified time: 2022-02-13 01:56:52
+ * @ Modified time: 2022-02-16 10:16:36
  * @ Description:
  */
-
 
 #include "MotorController.h"
 
 // Begin Motor Class
 
-void Motor_BTS7960::init(uint8_t motor_no, uint8_t motor_EN_L_pin, uint8_t motor_EN_R_pin, uint8_t motor_PWM_L_pin, uint8_t motor_PWM_R_pin, uint16_t frequency, uint16_t resolution, int flip_dir){
+void Motor_BTS7960::init(uint8_t motor_no, uint8_t motor_EN_L_pin, uint8_t motor_EN_R_pin, uint8_t motor_PWM_L_pin, uint8_t motor_PWM_R_pin, uint16_t frequency, uint16_t resolution, int flip_dir)
+{
     // Anything you need when instantiating your object goes here
     _motor_no = motor_no;
     _flip_dir = flip_dir;
@@ -43,7 +43,6 @@ void Motor_BTS7960::init(uint8_t motor_no, uint8_t motor_EN_L_pin, uint8_t motor
 #ifdef DEBUG
     Serial.println("motor\t" + String(_motor_no) + "\t" + String(_motor_EN_L_pin) + "\t" + String(_motor_EN_R_pin) + "\t" + String(_motor_PWM_L_pin) + "\t" + String(_motor_PWM_R_pin));
 #endif
-
 }
 
 void Motor_BTS7960::drive(int8_t dir, uint16_t motorSpeed)
@@ -130,7 +129,7 @@ void Motor_BTS7960::motorEnable(int pin, int hilo)
 }
 
 // Begin Brushless 400W Rio Rand Motor Class
-void Motor_BRUSHLESS_400W::init(uint8_t motor_no, uint8_t motor_EN_L_pin, uint8_t motor_EN_R_pin, uint8_t motor_PWM_L_pin, uint8_t motor_PWM_R_pin, uint16_t frequency, uint16_t resolution, int flip_dir)
+void Motor_BRUSHLESS_400W::init(uint8_t motor_no, uint8_t motor_BRAKE_pin, uint8_t motor_DIRECTION_pin, uint8_t motor_PWM_pin, uint8_t motor_ENCODER_pin, uint16_t frequency, uint16_t resolution, int flip_dir)
 {
     // Anything you need when instantiating your object goes here
     _motor_no = motor_no;
@@ -138,13 +137,17 @@ void Motor_BRUSHLESS_400W::init(uint8_t motor_no, uint8_t motor_EN_L_pin, uint8_
     _frequency = frequency;
     _resolution = resolution;
 
-    _motor_BRAKE_pin = motor_EN_L_pin;     // BRAKE
-    _motor_DIRECTION_pin = motor_EN_R_pin; // DIRECTION
-    _motor_PWM_pin = motor_PWM_L_pin;      // Motor PWM
-    _encoder_pin = motor_PWM_R_pin;        // ENCODER
+    _motor_BRAKE_pin = motor_BRAKE_pin;         // BRAKE
+    _motor_DIRECTION_pin = motor_DIRECTION_pin; // DIRECTION
+    _motor_PWM_pin = motor_PWM_pin;             // Motor PWM
+    _motor_ENCODER_pin = motor_ENCODER_pin;     // ENCODER
     pinMode(_motor_BRAKE_pin, OUTPUT);
     pinMode(_motor_DIRECTION_pin, OUTPUT);
     pinMode(_motor_PWM_pin, OUTPUT);
+    // pinMode(_encoder_pin, INPUT_PULLDOWN);
+    // attachInterrupt(digitalPinToInterrupt(_encoder_pin), readEncoder(), RISING);
+    // readEncoder();
+
 #ifdef ESP32M
     ledcSetup(_motor_no, _frequency, _resolution); // There are 16 channels avail 0 to 15
     ledcAttachPin(_motor_PWM_pin, _motor_no);
@@ -250,14 +253,14 @@ void Motor_BRUSHLESS_400W::motorEnable(int pin, int hilo)
 
 void Motor_BRUSHLESS_400W::readEncoder()
 {
-    int b = digitalRead(_encoder_pin);
+    int b = digitalRead(_motor_ENCODER_pin);
     if (b > 0)
     {
-        posi++;
+        _posi++;
     }
     else
     {
-        posi--;
+        _posi--;
     }
 }
 
