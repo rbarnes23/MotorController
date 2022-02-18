@@ -15,7 +15,7 @@
 #else
 #include "WProgram.h"
 #endif
-#define ESP32M true
+
 //#define DEBUG true
 // vra and vrb are used to adjust individual motor speeds on the fly
 struct motorDrive
@@ -34,7 +34,6 @@ struct PWM
     float right_voltage;
 };
 
-// enum BoardType{NODEMCU32S,TEENSY40};
 
 class Motor
 {
