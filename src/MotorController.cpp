@@ -29,7 +29,7 @@ void Motor_BTS7960::init(uint8_t motor_no, uint8_t motor_EN_L_pin, uint8_t motor
     // There are 16 channels avail 0 to 15.  BTS7960 requires 2 channels for each controller
     _pwmChannel_LEFT = _motor_no * 2;
     _pwmChannel_RIGHT = (_motor_no * 2) + 1;
-#ifdef ESP32M
+#ifdef ESP32
     ledcSetup(_pwmChannel_LEFT, _frequency, _resolution);
     ledcSetup(_pwmChannel_RIGHT, _frequency, _resolution);
     ledcAttachPin(_motor_PWM_L_pin, _pwmChannel_LEFT);
@@ -72,7 +72,7 @@ void Motor_BTS7960::drive(int8_t dir, uint16_t motorSpeed)
     case 1:
         // FORWARD
         // Set the speed of each motor
-#ifdef ESP32M
+#ifdef ESP32
         ledcWrite(_pwmChannel_LEFT, motorSpeed);
         ledcWrite(_pwmChannel_RIGHT, 0);
 #else
@@ -87,7 +87,7 @@ void Motor_BTS7960::drive(int8_t dir, uint16_t motorSpeed)
     case -1:
         // BACKWARDS
         // Set the speed of each motor
-#ifdef ESP32M
+#ifdef ESP32
         ledcWrite(_pwmChannel_LEFT, 0);
         ledcWrite(_pwmChannel_RIGHT, motorSpeed);
 #else
@@ -108,7 +108,7 @@ void Motor_BTS7960::drive(int8_t dir, uint16_t motorSpeed)
 void Motor_BTS7960::stop()
 {
 
-#ifdef ESP32M
+#ifdef ESP32
     ledcWrite(_pwmChannel_LEFT, 0);
     ledcWrite(_pwmChannel_RIGHT, 0);
 #else
@@ -148,7 +148,7 @@ void Motor_BRUSHLESS_400W::init(uint8_t motor_no, uint8_t motor_BRAKE_pin, uint8
     // attachInterrupt(digitalPinToInterrupt(_encoder_pin), readEncoder(), RISING);
     // readEncoder();
 
-#ifdef ESP32M
+#ifdef ESP32
     ledcSetup(_motor_no, _frequency, _resolution); // There are 16 channels avail 0 to 15
     ledcAttachPin(_motor_PWM_pin, _motor_no);
 #else
@@ -166,7 +166,7 @@ void Motor_BRUSHLESS_400W::drive(int8_t dir, uint16_t motorSpeed)
     dir *= _flip_dir;
     if (dir != _last_direction) // Brake before changing direction
     {
-#ifdef ESP32M
+#ifdef ESP32
         ledcWrite(_motor_no, 0);
 #else
         analogWrite(_motor_PWM_pin, 0);
@@ -185,7 +185,7 @@ void Motor_BRUSHLESS_400W::drive(int8_t dir, uint16_t motorSpeed)
     }
     else
     {
-#ifdef ESP32M
+#ifdef ESP32
         ledcWrite(_motor_no, 0);
 #else
         analogWrite(_motor_PWM_pin, 0);
@@ -201,7 +201,7 @@ void Motor_BRUSHLESS_400W::drive(int8_t dir, uint16_t motorSpeed)
         // Set the speed of each motor
 
         digitalWrite(_motor_DIRECTION_pin, HIGH);
-#ifdef ESP32M
+#ifdef ESP32
         ledcWrite(_motor_no, motorSpeed);
 #else
         analogWrite(_motor_PWM_pin, motorSpeed);
@@ -215,7 +215,7 @@ void Motor_BRUSHLESS_400W::drive(int8_t dir, uint16_t motorSpeed)
         // BACKWARDS
         // Set the speed of each motor
         digitalWrite(_motor_DIRECTION_pin, LOW);
-#ifdef ESP32M
+#ifdef ESP32
         ledcWrite(_motor_no, motorSpeed);
 #else
         analogWrite(_motor_PWM_pin, motorSpeed);
@@ -233,7 +233,7 @@ void Motor_BRUSHLESS_400W::drive(int8_t dir, uint16_t motorSpeed)
 
 void Motor_BRUSHLESS_400W::stop()
 {
-#ifdef ESP32M
+#ifdef ESP32
     ledcWrite(_motor_no, 0);
 #else
     analogWrite(_motor_PWM_pin, 0);
